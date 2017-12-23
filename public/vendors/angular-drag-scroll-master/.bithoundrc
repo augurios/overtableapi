@@ -1,0 +1,24 @@
+{
+  "ignore": [
+    "**/docs/**",
+    "**/node_modules/**",
+    "**/**-min-**",
+    "**/**-min.**",
+    "**/**.min.**",
+    "bower_components/**"
+  ],
+  "test": [
+    "**/test/**",
+    "**/tests/**",
+    "**/spec/**",
+    "**/specs/**"
+  ],
+  "critics": {
+    "wc": { "limit": 2500 }
+  },
+  "dependencies": {
+    "unused-ignores": [
+      "angular"
+    ]
+  }
+}

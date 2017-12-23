@@ -1,20 +1,13 @@
 {
-  "name": "Overtable-Beta",
-  "main": "launcher.html",
-  "node-main": "app.js",
+  "name": "Overtable",
   "version": "1.0.0",
   "description": "The project for resturants/manage",
   "private": true,
-  "chromium-args": "--mixed-context",
-  "window": {
-    "fullscreen": false,
-    "kiosk": false,
-    "min_width": 1024,
-    "min_height": 768
-  },
+  "main": "app.js",
   "scripts": {
     "start": "node app"
   },
+  
   "author": "Disruptive Partners",
   "license": "ISC",
   "homepage": "https://bitbucket.org/overtable/tech_dev#readme",
@@ -70,5 +63,3 @@
     "run-sequence": "^1.2.2"
   }
 }
-
-
