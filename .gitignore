@@ -1,5 +1,2 @@
-node_modules/
-nouploads/
-public/app/libs/src/library.min.js
 .idea
 package-lock.json
