@@ -1,0 +1,435 @@
+<html>
+<head>
+	<title>Overtable | POS </title>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+	
+	<script src="vendors/bower_components/angular/angular.min.js"></script>
+	<script src="vendors/bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
+	<script src="ui-bootstrap-tpls-2.5.0.min.js"></script>
+	<link href="vendors/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	
+
+<script type="text/javascript">
+	setTimeout(function(){ 
+		
+		var element = document.getElementById("mainFrame");
+		element.classList.add("loaded");
+		
+		
+		}, 10000);
+		
+		
+	var win = nw.Window.get();
+	var pinters = [];
+		
+	var loadPrinters = function(printJob) {
+		
+		pinters = printJob;
+		
+		
+	};
+	
+	win.getPrinters(loadPrinters);
+	
+	var http = require('http');
+
+	  http.createServer(function (req, res) {
+	  	win.getPrinters(loadPrinters);
+		if (req.url == '/printers') {
+			win.getPrinters(loadPrinters);
+			res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+			res.setHeader('Access-Control-Request-Method', '*');
+			res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT');
+			res.setHeader('Access-Control-Allow-Headers', "access-control-allow-credentials,access-control-allow-headers,access-control-allow-methods,access-control-allow-origin,if-modified-since,x-access-token"); 
+	        res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.end(JSON.stringify(pinters));
+	    } 
+		else if (req.url == '/printinvoice') {
+	       
+	        req.on('data', function(chunk) {
+			  console.log(JSON.parse(chunk));
+			  printJob = JSON.parse(chunk);
+			  
+			  //map template
+			  var legalnameHolder = document.getElementById("invoice-legalname");
+			  var restnameHolder = document.getElementById("invoice-restname");
+			  var addressHolder = document.getElementById("invoice-address");
+			  var phoneHolder = document.getElementById("invoice-phone");
+			  var cedulaHolder = document.getElementById("invoice-cedula");
+			  var disclaimerHolder = document.getElementById("invoice-disclaimer");
+			  var wifiHolder = document.getElementById("invoice-wifi");
+			  var nameHolder = document.getElementById("invoice-name");
+			  var tableHolder = document.getElementById("invoice-table");
+			  var numberHolder = document.getElementById("invoice-number");
+			  var servedHolder = document.getElementById("invoice-served");
+			  var dateHolder = document.getElementById("invoice-date");
+			  var timeHolder = document.getElementById("invoice-time");
+			  var statusHolder = document.getElementById("invoice-status");
+			  var ordersHolder = document.getElementById("item-container");
+			  var totalHolder = document.getElementById("invoice-total");
+			  var gtotalHolder = document.getElementById("invoice-grandtotal");
+			  
+			  //inject data into template
+			  restnameHolder.innerHTML = printJob.restName;
+			  legalnameHolder.innerHTML = printJob.legalName 
+			  phoneHolder.innerHTML = printJob.phone 
+			  addressHolder.innerHTML = printJob.address
+			  cedulaHolder.innerHTML = printJob.cJuridica
+			  disclaimerHolder.innerHTML = printJob.disclaimer 
+			  wifiHolder.innerHTML = printJob.wifi
+			  nameHolder.innerHTML = printJob.clientName;
+			  numberHolder.innerHTML = printJob.number;
+			  servedHolder.innerHTML = printJob.servedBy;
+			  var times = printJob.date.split('T');
+			  dateHolder.innerHTML = times[0];
+			  timeHolder.innerHTML = times[1];
+			  if(printJob.table) {
+				  tableHolder.innerHTML = printJob.table;
+			  }
+			  
+			  
+			  if (printJob.open) {
+				  statusHolder.innerHTML = " - CUENTA PENDIENTE - ";
+			  } else {
+				  statusHolder.innerHTML = " - CUENTA CERRADA - "
+			  };
+			  
+			  for (var i = 0; i < printJob.orders.length; i++) {
+				  var new_row = document.createElement('tr');
+				  new_row.className = "item";
+				  var new_row_name = document.createElement('td');
+				  var name = document.createTextNode(printJob.orders[i].product.Name); 
+				  new_row_name.appendChild(name); 
+				  new_row.appendChild(new_row_name);
+				  
+				  var new_row_price = document.createElement('td');
+				  var price = document.createTextNode(printJob.orders[i].product.Price); 
+				  new_row_price.appendChild(price); 
+				  new_row.appendChild(new_row_price);
+				  
+				  var content = new_row;
+				  
+				  console.log(typeof content, content);
+				  ordersHolder.appendChild(content);
+			  }
+			  
+			  totalHolder.innerHTML = printJob.prices.total;
+			  gtotalHolder.innerHTML = printJob.prices.grandtotal;
+			  
+		      options = {
+			       printer: printJob.printer,
+			       marginsType: 2,
+			       headerFooterEnabled: false
+		       }
+		   	   var d = document.getElementById("invoice-box");
+		   	   d.classList.add("active");
+		      win.print(options);
+		      ordersHolder.innerHTML = "";
+		      return d.classList.remove("active");
+		    });
+	       
+	       res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+			res.setHeader('Access-Control-Request-Method', 'POST');
+			res.setHeader('Access-Control-Allow-Methods', 'POST');
+			res.setHeader('Access-Control-Allow-Headers', "access-control-allow-credentials,access-control-allow-headers,access-control-allow-methods,access-control-allow-origin,content-type,x-access-token"); 
+	        res.writeHead(200, {'Content-Type': 'text/plain'});
+	       res.end("printing");
+	    } 
+		else if (req.url == '/printorder') {
+	       
+	        req.on('data', function(chunk) {
+			  console.log(JSON.parse(chunk));
+			  printJob = JSON.parse(chunk);
+			  
+			  //map template
+			  var nameHolder = document.getElementById("order-name");
+			  var clientHolder = document.getElementById("order-client");
+			  var tableHolder = document.getElementById("order-table");
+			  var timeHolder = document.getElementById("order-time");
+			  var extrasHolder = document.getElementById("order-extras");
+			  var variationHolder = document.getElementById("order-variations");
+			  var notesHolder = document.getElementById("order-notes");
+			  
+			  
+			  
+			  //inject data into template
+			  nameHolder.innerHTML = printJob.product.Name;
+			  clientHolder.innerHTML = printJob.client;
+			  if(printJob.tableName) {
+			  	tableHolder.innerHTML = printJob.tableName + ' - ' + printJob.tableNum.toString();
+			  }
+			  var times = printJob.time.split('T');
+			  timeHolder.innerHTML = times[1];
+			  
+			  
+			  for (var i = 0; i < printJob.extraingredient.length; i++) {
+				  var new_row = document.createElement('tr');
+				  var new_row_name = document.createElement('td');
+				  var name = document.createTextNode(printJob.extraingredient[i]); 
+				  new_row_name.appendChild(name); 
+				  new_row.appendChild(new_row_name);
+				  
+				  
+				  var content = new_row;
+				  extrasHolder.appendChild(content);
+			  }
+			  
+			  if(printJob.note) {
+				  notesHolder.innerHTML = printJob.note;
+			  }
+			  
+			  if(printJob.variation) {
+			  variationHolder.innerHTML = printJob.variation;
+			  }
+		      options = {
+			       printer: printJob.printer,
+			       marginsType: 2,
+			       headerFooterEnabled: false
+		       }
+		   	   var d = document.getElementById("order-box");
+		   	   d.classList.add("active");
+		      win.print(options);
+		      extrasHolder.innerHTML = "";
+		      return d.classList.remove("active");
+		    });
+	       
+	       res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+			res.setHeader('Access-Control-Request-Method', 'POST');
+			res.setHeader('Access-Control-Allow-Methods', 'POST');
+			res.setHeader('Access-Control-Allow-Headers', "access-control-allow-credentials,access-control-allow-headers,access-control-allow-methods,access-control-allow-origin,content-type,x-access-token"); 
+	        res.writeHead(200, {'Content-Type': 'text/plain'});
+	       res.end("printing");
+	    } 
+		else if (req.url == '/exit') {
+			res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+			res.setHeader('Access-Control-Request-Method', '*');
+			res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT');
+			res.setHeader('Access-Control-Allow-Headers', "access-control-allow-credentials,access-control-allow-headers,access-control-allow-methods,access-control-allow-origin,if-modified-since,x-access-token"); 
+	        res.writeHead(200, {'Content-Type': 'text/plain'});
+			
+			win.close(true);
+			res.end(JSON.stringify({'message':'exit'}));
+		}
+	    
+	    
+	  }).listen(10086);
+	
+	  	
+
+</script>
+
+<style>
+	body,
+	html {
+		width: 100%;
+		display: block;
+		height: 100%;
+		border: 0;
+		padding: 0;
+		margin: 0;
+		overflow: hidden;
+		background: url('public/assets/img/logo.png');
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: cover;
+		
+		
+		}	
+	#mainFrame{
+		width: 100%;
+		display: block;
+		height: 100%;
+		border: 0;
+		padding: 0;
+		margin: 0;
+		opacity: 0;
+		transition: opacity 1s ease;
+	}
+	
+	#mainFrame.loaded {
+		opacity: 1;
+	}
+	
+	.invoice-box,
+	.order-box {
+		display: none;
+	}
+		
+</style>
+
+<link rel="stylesheet" href="public/print-style.css" type="text/css" media="print" /><!-- media="print"-->
+
+</head>
+<body>
+	
+
+<iframe src="http://localhost:8088" frameborder="0" id="mainFrame"></iframe>
+
+			
+<div class="invoice-box" id="invoice-box">    
+	<table cellpadding="0" cellspacing="0">   
+		<tbody>
+			<tr class="top">   
+				<td colspan="2">   
+					<table>   
+						<tbody>
+							<tr>   
+								<td class="title">   
+									<h3><span id="invoice-legalname"></span></h3>
+									<h1><span id="invoice-restname"></span></h1>
+									<p><span id="invoice-address"></span></p>
+									<p>Tel.: <span id="invoice-phone"></span></p>
+									<p>Cedula Juridica <span id="invoice-cedula"></span></p>
+								</td>   
+								  
+								</tr>   
+						</tbody>
+					</table>   
+				</td>   
+			</tr>   
+			<tr class="information">   
+				<td colspan="2">   
+					<table>   
+						<tbody>
+							<tr>   
+								<td>   
+									Factura <span id="invoice-number"></span> <br>
+									Recepción: <span id="invoice-served"></span><br>
+									Cliente: <span id="invoice-name"></span><br>
+									Mesa: <span id="invoice-table"></span>
+									
+								</td>   
+								<td>   
+									  <span id="invoice-date"></span> <br>
+									  <span id="invoice-time"></span> 
+									  
+									
+								</td>   
+							</tr>  
+					    </tbody>
+					</table>   
+				</td>   
+			</tr>   
+					
+					 <tr class="heading">   <td>   Producto   </td>   <td>   Precio   </td>   </tr> 
+					 
+					 <tr>
+						 <td colspan="2">   
+							<table>   
+								<tbody id="item-container">
+								</tbody>
+							</table>
+						 </td>
+						 
+					 </tr>
+					   
+					  
+					  
+					  
+					  <tr class="total">   <td></td>   <td>   Sub-Total: <span id="invoice-total"></span>    </td>   </tr>  
+					 <tr class="total">   <td></td>   <td>   Total: <span id="invoice-grandtotal"></span>    </td>   </tr>   
+					 
+					  <tr class="status">      <td colspan="2">   <span id="invoice-status"></span>    </td>   </tr> 
+					  <tr class="disclaimer">  
+						      <td colspan="2">  
+							     <span id="invoice-disclaimer"></span> <br>
+						  					Clave WIFI: <span id="invoice-wifi"></span>
+						  					 <br>
+						  					  <br>
+						  					  -
+						  					
+						     </td>   
+					</tr> 
+				 </tbody>
+				 </table>  
+			</div>
+
+
+
+<div class="order-box" id="order-box">
+	
+	<table cellpadding="0" cellspacing="0">   
+		<tbody>
+			<tr>   
+				<td colspan="2">   
+					<table>   
+						<tbody>
+							<tr>   
+								<td class="title">
+									<h1 id="order-name">Nombre del Plato</h1>
+									<p>
+										<span id="order-client">Cliente nombre</span> | 
+										<span id="order-table">Mesa 4</span>  | 
+										
+										<span id="order-time">4:68 pm</span>  
+
+										
+									</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>   
+				<td colspan="2" class="heading">  
+					<span id="order-variations"></span>
+				</td>
+			</tr>
+			
+			<tr>   
+				<td colspan="2" class="heading">  
+					<small>Extras</small>
+				</td>
+			</tr>
+			<tr>   
+				<td colspan="2">   
+					<table>   
+						<tbody id="order-extras">
+							
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>   
+				<td colspan="2" class="heading">  
+					<small>Notas</small>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<p id="order-notes"></p>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>
+					<p >-&nbsp;</p>
+				</td>
+			</tr>
+
+		</tbody>
+	</table>
+							
+	
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

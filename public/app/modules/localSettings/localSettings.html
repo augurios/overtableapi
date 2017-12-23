@@ -1,0 +1,82 @@
+<section id="main">
+
+    <section class="container">
+        <div class="col-xs-12 col-sm-12">
+            <p class="lead text-center"> Settings</p>
+        </div>
+    </section>
+    
+    <section class="container">
+    	
+    	<div class="row">
+    		<div class="col-xs-12 col-md-6 col-md-offset-3">
+	    		<form ng-submit="saveSettings()" >
+			  <fieldset>
+				  
+				  <div class="panel panel-default">
+						  <div class="panel-heading">
+							  <h3>Print Options</h3>
+						  </div>
+						  <div class="panel-body">
+							 <div class="row">
+							 	<div class="col-md-12">
+							     <div class="form-group">
+								    <label for="printer1">Invoice Printer</label>
+								    <select class="form-control" id="printer1" ng-model="currentPrinters.Printer1">
+									    <option ng-repeat="printer in allPrinters" value="{{printer.device}}">{{printer.name}}</option>
+									 
+									</select>
+								    
+								    <span class="help-block">Select the printer for invoices and bills</span>
+								 </div>
+							     <div class="form-group">
+								    <label for="printer2">Order Printer 1</label>
+								    <select class="form-control" id="printer2" ng-model="currentPrinters.Printer2">
+									  <option ng-repeat="printer in allPrinters" value="{{printer.device}}">{{printer.name}}</option>
+									</select>
+								    
+								    <span class="help-block">Select a printer for orders.</span>
+								 </div>
+							     <div class="form-group">
+								    <label for="printer3">Order Printer 2</label>
+								     <select class="form-control" id="printer3" ng-model="currentPrinters.Printer3">
+									  <option ng-repeat="printer in allPrinters" value="{{printer.device}}">{{printer.name}}</option>
+									</select>
+								    
+								    <span class="help-block">Select a printer for orders.</span>
+								 </div>
+							     <div class="form-group">
+								     <label class="checkbox-inline">
+									  <input type="checkbox" id="inlineCheckbox1" value="true" ng-model="currentPrinters.printOnOrderPlace"> Print Order when placed
+									</label>
+							     </div>
+							     <div class="form-group">
+									<label class="checkbox-inline">
+									  <input type="checkbox" id="inlineCheckbox2" value="option2" ng-model="currentPrinters.printOnOrderComplete"> Print Order when Completed 
+									</label>
+							     </div>
+							     
+							     </div>
+							 </div>
+						  </div>
+						</div>
+						
+						
+				  
+				 
+				
+				 
+				
+					 <div class="form-group">
+					 	<button type="submit" name="submitbtn" class="btn btn-primary btn-raised" >Update</button>
+					 </div>
+			  </fieldset>
+			</form>
+    		</div>
+    	</div>
+    	
+    </section>
+
+</section>
+
+

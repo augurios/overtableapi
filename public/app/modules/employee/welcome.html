@@ -1,0 +1,66 @@
+<section id="main" translate-namespace="EMPLOYEE">
+
+    <section class="container">
+        <div class="col-xs-12 col-sm-12">
+            <p class="lead text-center" translate> .HEADING</p>
+        </div>
+    </section>
+    
+    <section class="container">
+    	<div class="row">
+    		<div class="col-md-8 col-md-offset-2">
+	    		<div class="shift-panel well">
+		    		<h2><span translate>.SHIFTSTATUS</span>: <small class="text-danger" ng-hide="shiftOpen" translate>.CLOSED</small> <small class="text-primary" ng-show="shiftOpen" translate>.OPEN</small></h2>
+		    		
+		    		<p ng-hide="shiftOpen" translate>.OPENSHIFTTOCREATEINVOICES</p>
+		    		
+		    		<p ng-show="shiftOpen" ><span translate>.SHIFTOPENAT</span> : {{shift.starttime|date:'shortTime'}}</p>
+		    		
+		    		<button class="btn btn-primary btn-raised" ng-hide="shiftOpen" ng-click="shiftOn()" translate>.OPENSHIFT</button>
+		    		<button class="btn btn-danger btn-raised" ng-show="shiftOpen" ng-click="shiftOff()" translate>.CLOSESHIFT</button>
+	    		</div>
+    		</div>
+    		<!--<div class="col-md-6">
+	    		<div class="widget-panel well">
+		    		
+		    		<h2>Low on Stock</h2>
+		    		
+		    		<div class="low-stock-item alert alert-dismissible alert-danger">
+			    		<h4>Tomate</h4>
+			    		<p>1.5gm</p>
+		    		</div>
+		    		
+		    		<div class="low-stock-item alert alert-dismissible alert-warning">
+			    		<h4>Coke</h4>
+			    		<p>3 units</p>
+		    		</div>
+		    		
+	    		</div>
+    		</div>-->
+    	</div>
+    	<div class="row">
+    		<div class="col-md-3 col-md-offset-2">
+	    		<div class="widget-panel well" ng-show="shiftOpen">
+		    		
+		    		<h2>{{ 'LIVESTATS' | translate }}</h2>
+		    		
+		    		<ul class="list-unstyled">
+			    		<li>{{ 'INVOICES' | translate }} <span class="badge">{{(shift.invoices).length}}</span></li>
+			    		<li>{{ 'ORDERS' | translate }} <span class="badge">{{(shift.orders).length}}</span></li>
+			    		
+		    		</ul>
+		    		
+		    		
+		    		
+		    		
+	    		</div>
+    		</div>
+    		<div class="col-md-6">
+	    		
+    		</div>
+    	</div>
+    </section>
+
+</section>
+
+

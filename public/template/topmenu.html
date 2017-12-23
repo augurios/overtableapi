@@ -1,0 +1,102 @@
+<div class="loggedIn"></div>
+<div class="navbar navbar-default navbar-fixed-top animate" translate-namespace="TOP_MENU">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="javascript:void(0)">Brand</a>
+    </div>
+    <div class="navbar-collapse collapse navbar-responsive-collapse">
+      <ul class="nav navbar-nav">
+	    <li ui-sref="employeedashboard" ui-sref-active="active">
+			<a ui-sref="employeedashboard">
+				<i class="material-icons">home</i>
+				<span translate>.HOME</span>
+				<div class="ripple-container"></div>
+			</a>
+		</li>
+	   
+        <li ui-sref="cashierHall({id:'{{room._id}}'})" ui-sref-active="active" ng-repeat="room in restoRooms">
+			<a ui-sref="cashierHall({id:'{{room._id}}'})" ng-show="shiftOpen">
+				<i class="material-icons">event_seat</i>
+				<span>{{room.name}}</span>
+				<div class="ripple-container"></div>
+			</a>
+		</li>
+          
+
+		<li ui-sref="cashierBills" ui-sref-active="active" ng-show="shiftOpen">
+			<a ui-sref="cashierBills" >
+				<i class="material-icons">receipt</i>
+					<span translate>.BILLS</span>
+				<div class="ripple-container"></div>
+			</a>
+		</li>
+
+          
+
+		<li ui-sref="inventoryManager" ui-sref-active="active">
+			<a ui-sref="inventoryManager" >
+				<i class="material-icons">content_paste</i>
+					<span translate>.INVENTORY</span>
+				<div class="ripple-container"></div>
+			</a>
+		</li>
+		<li ui-sref="ordersMonitor" ui-sref-active="active" ng-show="shiftOpen">
+			<a ui-sref="ordersMonitor" >
+				<i class="material-icons">library_books</i>
+					<span translate>.ORDERS</span>
+				<div class="ripple-container"></div>
+			</a>
+		</li>
+       
+				
+      </ul>
+     <!-- <form class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" class="form-control col-md-8" placeholder="Search">
+        </div>
+      </form> -->
+      <ul class="nav navbar-nav navbar-right">
+        
+		
+		<!-- {{lang == 'sp' ? "Spanish" : "English"}} -->
+		
+        <li class="dropdown">
+          <a href="#"  class="dropdown-toggle" data-toggle="dropdown">
+           <i class="material-icons">account_circle</i> <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+			 <li>
+					<a ui-sref="empprofile">
+						<span translate>.PROFILE</span>
+					</a>
+			</li>
+			<li>
+					<a ui-sref="localsettings">
+						<span translate>.SETTINGS</span>
+					</a>
+			</li>
+			<li ng-show="lang == 'en'"> <a href="#" ng-click="changeLanguage('sp')" translate="BUTTON_LANG_SP"></a></li>
+			 <li ng-show="lang == 'sp'"><a href="#" ng-click="changeLanguage('en')" translate="BUTTON_LANG_EN"></a>
+			 </li>	
+			<li>
+				<a href="#" ng-click="core.terminate()" >
+					<span class="hidden-xs" translate>.TERMINATE_SESSION</span>
+					<span class="visible-xs" translate>.TERMINATE_SESSION</span>
+				</a>
+			</li>
+			<li>
+				<a href="#" ng-click="core.exitApp()" >
+					<span translate>.EXIT</span>
+					
+				</a>
+			</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
