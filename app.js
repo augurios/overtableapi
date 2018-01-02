@@ -14,10 +14,15 @@ var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 //var MongoDBStore = require('connect-mongodb-session')(session);
 const MongoStore = require('connect-mongo')(session);
 
+var cors = require('cors');
+
 global.connections = [];
 
 var app = express();
+app.use(cors())
+
 var router = express.Router();
+router.all('*', cors());
 
 var common = require('./server/helpers/common');
 
@@ -34,8 +39,10 @@ process.on('uncaughtException', function (err) {
 
 app.set('port', port);
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit:50000}));
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb'}));
 app.use(cookieParser());
 app.use('/', serveStatic(__dirname + '/')); // serve static files
 app.use('/public', serveStatic(__dirname + '/public')); // serve static files
@@ -94,12 +101,17 @@ var sessionMiddleware = session({
     name: 'MyLANapp',
     saveUninitialized: false, // don't create session until something stored
     resave: true, //don't save session if unmodified
-    cookie : {maxAge: date}, 
-    rolling : true, //won't have to log in for a year from last touch Prevent Browser cookie deletion on exit
+    cookie: {
+        maxAge: date,
+        secure: false,
+        httpOnly: false,
+        sameSite: false
+    },
+    rolling: true, //won't have to log in for a year from last touch Prevent Browser cookie deletion on exit
     store: new MongoStore({
         url: db.connectionstring,
-        collection : db.collection.session_collection,
-         //touchAfter: 24 * 3600, // time period in seconds // session be updated only one time in a period of 24 hours
+        collection: db.collection.session_collection,
+        //touchAfter: 24 * 3600, // time period in seconds // session be updated only one time in a period of 24 hours
         ttl: 24 * 60 * 60
     })
 })

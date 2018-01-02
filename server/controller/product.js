@@ -553,6 +553,7 @@ module.exports = function (app) {
                        category.Quantity = postdata[postcat].Quantity;
                        category.UnitType = postdata[postcat].UnitType;
                        category.message = postdata[postcat].message;
+                       category.isactive = postdata[postcat].isactive;
                    }
                }
                category.save(category, function (err, result) {
@@ -581,6 +582,7 @@ module.exports = function (app) {
                       for (var j = 0; j < ref.length; j++) {
                           if (Ingradients[i].name == ref[j].clientId)
                               Ingradients[i].name = ref[j]._id;
+                              
                       }
                   }
                   return Ingradients;
@@ -596,6 +598,7 @@ module.exports = function (app) {
                           category = results[catc];
                           category.Name = postdata[postcat].Name;
                           category.Ingradients = replaceIngName(postdata[postcat].Ingradients, ingref);
+                          category.isactive = postdata[postcat].isactive;
                       }
                   }
                   category.save(category, function (err, result) {
@@ -745,8 +748,9 @@ module.exports = function (app) {
               });
     });
 
-
     function updateSingleInvoice(invoice, islast, cb) {
+        if (invoice.orders)
+            delete invoice.orders;
         var localinvoice = new Invoice(invoice);
         Invoice.find({ clientId: localinvoice.clientId }, function (err, invoices) {
             var invoiceupdate = localinvoice;
@@ -769,19 +773,72 @@ module.exports = function (app) {
                     console.log('success')
                     console.log({ message: 'Update Successfully' })
                 }
+
+                cb(islast);
+
             });
 
-            cb(islast);
+
         });
     }
 
     function addInvoices(TBMData) {
         return new Promise(function (resolve, reject) {
             if (TBMData.INVOICES.length > 0) {
-                var counter = 0;
                 for (var cnt = 0; cnt < TBMData.INVOICES.length; cnt++) {
-                    var islast = counter == cnt;
+                    var islast = TBMData.INVOICES.length - 1 == cnt;
                     updateSingleInvoice(TBMData.INVOICES[cnt], islast, function (islastrecord) {
+                        if (islastrecord)
+                            resolve("Uploaded");
+                    });
+                }
+            } else
+                resolve("Uploaded");
+        });
+    }
+
+    function mapSingleInvoice(localinvoice, islast, cb) {
+        Invoice.find({ clientId: localinvoice.clientId }, function (err, invoices) {
+            if (invoices && invoices.length > 0) {
+                var invoiceupdate = invoices[0];
+                Order.find({ invoiceId: invoiceupdate.id }, function (err, orders) {
+                    if (orders && orders.length > 0) {
+                        invoiceupdate.orders = [];
+                        for (var cnt = 0; cnt < orders.length; cnt++) {
+                            var orderExist = _.find(invoiceupdate.orders, function (oned) {
+                                return oned.toString() == orders[cnt].id.toString();
+                            });
+                            if (!orderExist)
+                                invoiceupdate.orders.push(orders[cnt]);
+                        }
+                        invoiceupdate.save(invoiceupdate, function (err) {
+                            if (err) {
+                                console.log('error')
+                                console.log({ message: 'error' })
+                            }
+                            else {
+                                console.log('success')
+                                console.log({ message: 'Update Successfully' })
+                            }
+                            cb(islast);
+                        });
+                    } else {
+                        cb(islast);
+                    }
+                });
+            }
+            else {
+                cb(islast);
+            }
+        });
+    }
+
+    function mapInvoices(TBMData) {
+        return new Promise(function (resolve, reject) {
+            if (TBMData.INVOICES.length > 0) {
+                for (var cnt = 0; cnt < TBMData.INVOICES.length; cnt++) {
+                    var islast = TBMData.INVOICES.length - 1 == cnt;
+                    mapSingleInvoice(TBMData.INVOICES[cnt], islast, function (islastrecord) {
                         if (islastrecord)
                             resolve("Uploaded");
                     });
@@ -800,8 +857,10 @@ module.exports = function (app) {
             con = { _id: mongoose.Types.ObjectId(order.invoiceId) };
 
         Invoice.find(con, function (err, invcs) {
-            if (!invcs)
-                return res.json({ message: 'error' })
+            if (!invcs) {
+                console.log({ message: 'error' });
+                cb(islast);
+            }
             else {
                 var invc = invcs[0];
                 var localorder = new Order(order);
@@ -815,38 +874,41 @@ module.exports = function (app) {
                         result.status = localorder.status;
                         orderupdate = result;
                     }
-                    orderupdate.invoiceId = invc.id.toString();
-                    orderupdate.save(orderupdate, function (err, resultorder) {
-                        if (err) {
-                            console.log('error')
-                            console.log({ message: 'error' })
-                        }
-                        else {
-                            console.log('success')
-                            console.log({ message: 'Update Successfully' })
-                        }
-
-                        invc.invoiceStatus = "STARTED";
-
-                        var orderExist = _.find(invc.orders, function (oned) {
-                            return oned.toString() == resultorder.id.toString();
-                        });
-
-                        if (!orderExist)
-                            invc.orders.push(resultorder.id);
-
-                        invc.save(function (err) {
+                    try {
+                        orderupdate.invoiceId = invc.id.toString();
+                        orderupdate.save(orderupdate, function (err, resultorder) {
                             if (err) {
                                 console.log('error')
-                                console.log({ message: 'error' })
+                                console.log({ message: 'error' });
+                                cb(islast);
                             }
                             else {
                                 console.log('success')
-                                console.log({ resultorder })
+                                console.log({ message: 'Update Successfully' })
+                                invc.invoiceStatus = "STARTED";
+                                var orderExist = _.find(invc.orders, function (oned) {
+                                    return oned.toString() == resultorder.id.toString();
+                                });
+                                if (!orderExist)
+                                    invc.orders.push(resultorder.id);
+                                invc.save(function (err) {
+                                    if (err) {
+                                        console.log('error')
+                                        console.log({ message: 'error' })
+                                    }
+                                    else {
+                                        console.log('success')
+                                        console.log({ resultorder })
+                                    }
+                                    cb(islast);
+                                });
                             }
+
                         });
-                    });
-                    cb(islast);
+                    } catch (err) {
+                        console.log("invoice not found ofr this order");
+                        cb(islast);
+                    }
                 });
             }
         });
@@ -855,9 +917,8 @@ module.exports = function (app) {
     function addOrders(TBMData) {
         return new Promise(function (resolve, reject) {
             if (TBMData.ORDERS.length > 0) {
-                var counter = 0;
                 for (var cnt = 0; cnt < TBMData.ORDERS.length; cnt++) {
-                    var islast = counter == cnt;
+                    var islast = TBMData.ORDERS.length - 1 == cnt;
                     updateSingleOrder(TBMData.ORDERS[cnt], islast, function (islastrecord) {
                         if (islastrecord)
                             resolve("Uploaded");
@@ -871,9 +932,8 @@ module.exports = function (app) {
     function addAllShift(TBMData) {
         return new Promise(function (resolve, reject) {
             if (TBMData.ALLSHIFT.length > 0) {
-                var counter = 0;
                 for (var cnt = 0; cnt < TBMData.ALLSHIFT.length; cnt++) {
-                    var islast = counter == cnt;
+                    var islast = TBMData.ALLSHIFT.length - 1 == cnt;
                     addShift(TBMData.ALLSHIFT[cnt], islast, function (islastrecord) {
                         if (islastrecord)
                             resolve("Uploaded");
@@ -959,7 +1019,7 @@ module.exports = function (app) {
           });
     }
 
-    function addShift(SHIFT,islast,cb) {
+    function addShift(SHIFT, islast, cb) {
         return new Promise(function (resolve, reject) {
             if (SHIFT) {
                 var localshift = new Shift(SHIFT);
@@ -1007,29 +1067,27 @@ module.exports = function (app) {
         Order.findOne({ clientId: order.clientId }).exec(function (err, orderModel) {
             var orderdId = orderModel.id;
             Invoice.findById(orderModel.invoiceId.toString(), function (err, invc) {
-                if (!invc)
-                    return console.log({ message: 'error' })
+                if (!invc) {
+                    console.log({ message: 'error' })
+                    cb(islast);
+                }
                 else {
-
                     for (var odCounter = 0; odCounter < invc.orders.length; odCounter++) {
                         if (invc.orders[odCounter] == orderdId) {
                             invc.orders.splice(odCounter, 1);
                         }
                     }
-
                     invc.save(function (err) {
                         if (err) {
                             console.log('error')
                             console.log({ message: 'error' })
+                            cb(islast);
                         }
                         else {
                             Order.findByIdAndRemove(orderdId, function (err, result) {
-                                // We'll create a simple object to send back with a message and the id of the document that was removed
-                                // You can really do this however you want, though.
                                 console.log({ message: 'Update Successfully' })
                                 cb(islast);
                             });
-
                         }
                     });
                 }
@@ -1040,9 +1098,8 @@ module.exports = function (app) {
     function removeOrders(TBMData) {
         return new Promise(function (resolve, reject) {
             if (TBMData.ORDERTODELETE.length > 0) {
-                var counter = 0;
                 for (var cnt = 0; cnt < TBMData.ORDERTODELETE.length; cnt++) {
-                    var islast = counter == cnt;
+                    var islast = TBMData.ORDERTODELETE.length -1 == cnt;
                     removeSingleOrder(TBMData.ORDERTODELETE[cnt], islast, function (islastrecord) {
                         if (islastrecord)
                             resolve("Uploaded");
@@ -1057,17 +1114,31 @@ module.exports = function (app) {
         console.log(updateSingleInvoice)
         console.log(req.body);
         var TBMData = req.body;
-        addInvoices(TBMData).then(function () {
-            addOrders(TBMData).then(function () {
-                addShift(TBMData.SHIFT).then(function () {
-                    addAllShift(TBMData).then(function () {
-                        removeOrders(TBMData).then(function () {
+        removeOrders(TBMData).then(function () {
+            addInvoices(TBMData).then(function () {
+                addOrders(TBMData).then(function () {
+                    mapInvoices(TBMData).then(function () {
+                        addShift(TBMData.SHIFT).then(function () {
+                            addAllShift(TBMData).then(function () {
+                                return res.json({ MSG: "Sync successfully" });
+                            }).catch(function (err) {
+                                return res.json({ MSG: "Sync successfully" });
+                            });
+                        }).catch(function (err) {
                             return res.json({ MSG: "Sync successfully" });
                         });
+                    }).catch(function (err) {
+                        return res.json({ MSG: "Sync successfully" });
                     });
+                }).catch(function (err) {
+                    return res.json({ MSG: "Sync successfully" });
                 });
+            }).catch(function (err) {
+                return res.json({ MSG: "Sync successfully" });
+            }).catch(function (err) {
+                return res.json({ MSG: "Sync successfully" });
             });
-        });
+        })
     });
 
 }// employee module ENDS

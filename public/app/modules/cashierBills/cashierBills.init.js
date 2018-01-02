@@ -46,7 +46,7 @@
                 });
                 auth.$inject = ['empService'];
                 function auth(empService) {
-                    if(navigator.onLine){
+                    if ($rootScope.online) {
                         return empService.authEmployee().then(function(data){ return data });
                     }
                     else{
@@ -57,7 +57,7 @@
                 }
                 ResolveEmployee.$inject = ['employeeprofileService'];
                 function ResolveEmployee(employeeprofileService) {
-                    if(navigator.onLine){
+                    if ($rootScope.online) {
                          //return employeeprofileService.CurrentEmployee().then(function(data){ return data });
                          return employeeprofileService.CurrentEmployee().then(function(data){ return data }); //temp
                     }

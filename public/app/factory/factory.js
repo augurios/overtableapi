@@ -1,11 +1,11 @@
 angular
     .module('mainServerapp')
-    .factory('pathservice',['$http','pouchDB','PATHS', function ($http,pouchDB,PATHS) {
+    .factory('pathservice', ['$http', 'pouchDB', 'PATHS', '$rootScope', function ($http, pouchDB, PATHS, $rootScope) {
      var db =  pouchDB('lanapp', {adapter : 'idb'});
      var consts = {
          consts: function (callback) {
              console.log("fetching path ");
-                    if(navigator.onLine){
+             if ($rootScope.online) {
                       $http.get('/auth/getpaths')
                       .success(function (data) {
                           console.log("constatnt data");
