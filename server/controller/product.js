@@ -761,6 +761,7 @@ module.exports = function (app) {
                 result.people = invoice.people;
                 result.tables = invoice.tables;
                 result.invoiceStatus = invoice.invoiceStatus;
+                result.iscash = invoice.iscash;
                 invoiceupdate = result;
             }
 
