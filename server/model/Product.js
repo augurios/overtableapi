@@ -30,7 +30,8 @@ var ProductSchema = new mongoose.Schema({
     isactive: { type: Number, default: 1 },
     restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     clientId: { type: String },
-    Edits: []
+    Edits: [],
+    OrderGroup:{type: String, default: 'A' }
 });
 
 mongoose.model('Product', ProductSchema);

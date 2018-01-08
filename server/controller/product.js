@@ -689,6 +689,7 @@ module.exports = function (app) {
                           category.Sides = replaceSidesName(postdata[postcat].Sides, sideref);
                           category.image = postdata[postcat].image;
                           category.variations = postdata[postcat].variations;
+                          category.OrderGroup = postdata[postcat].OrderGroup;
                       }
                   }
                   category.save(category, function (err, result) {
