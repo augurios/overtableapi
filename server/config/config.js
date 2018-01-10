@@ -5,7 +5,7 @@ var rootPath = path.normalize(__dirname + '/../..');
 
 // environment
 if (stage == "LOCAL") {
-  var URL_DOMAIN = "http://overtableapp.disruptive.pro/"+port+"/";
+  var URL_DOMAIN = "http://overtableapp.disruptive.pro:"+port+"/";
   var SERVER_RETURN_ROOT = URL_DOMAIN;
 }
 else {

@@ -6,7 +6,7 @@
 
 var mongoose = require('mongoose');
 
-const MGHOST = 'http://overtableapp.disruptive.pro/';
+const MGHOST = 'overtableapp.disruptive.pro';
 const MGUSER = 'dbadminapp';
 const MGPWWD = 'secoelpinto';
 const MGPORT = '27017';
