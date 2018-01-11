@@ -14,6 +14,7 @@ const Product = require('../model/Product');
 const Order = require('../model/Order');
 const Shift = require('../model/Shift');
 const Connection = require('../model/Connection');
+const Production = require('../model/Production');
 const Room = require('../model/Room');
 
 module.exports = function (app) {

@@ -16,8 +16,10 @@ const helpers = common.helpers;
 const messages = common.constants.messages();
 var Ingredients = common.mongoose.model('Ingredients');
 var Sides = common.mongoose.model('Sides');
+var Sides = common.mongoose.model('Sides');
 var Category = common.mongoose.model('Category');
 var Product = common.mongoose.model('Product');
+var Production = common.mongoose.model('Production');
 var Invoice = common.mongoose.model('Invoice');
 var Order = common.mongoose.model('Order');
 var Shift = common.mongoose.model('Shift');
@@ -205,6 +207,19 @@ module.exports = function (app) {
     app.post('/api/get/Sides', function (req, res) {
 
         Sides.find({ restaurant: req.body.id })
+.populate('Ingradients.name')
+.exec(function (err, result) {
+    if (err) {
+        console.log(err);
+        res.json(0);
+    }
+    return res.json(result);
+})
+
+    })
+    app.post('/api/get/Production', function (req, res) {
+
+        Production.find({ restaurant: req.body.id })
 .populate('Ingradients.name')
 .exec(function (err, result) {
     if (err) {
