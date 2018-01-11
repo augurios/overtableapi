@@ -16,7 +16,6 @@ const helpers = common.helpers;
 const messages = common.constants.messages();
 var Ingredients = common.mongoose.model('Ingredients');
 var Sides = common.mongoose.model('Sides');
-var Sides = common.mongoose.model('Sides');
 var Category = common.mongoose.model('Category');
 var Product = common.mongoose.model('Product');
 var Production = common.mongoose.model('Production');
