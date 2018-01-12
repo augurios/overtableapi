@@ -584,6 +584,78 @@ module.exports = function (app) {
        });
     });
 
+    
+
+    app.post('/api/sync/production', function (req, res) {
+        var counter = 0;
+        Ingredients.find({})
+       .exec(function (err, ingref) {
+           Production.find({}).populate('Ingradients.name')
+          .exec(function (err, results) {
+
+              //function replaceIngName(Ingradients, ref) {
+              //    for (var i = 0; i < Ingradients.length; i++) {
+              //        for (var j = 0; j < ref.length; j++) {
+              //            if (Ingradients[i].name == ref[j].clientId)
+              //                Ingradients[i].name = ref[j]._id;
+
+              //        }
+              //    }
+              //    return Ingradients;
+              //}
+
+              var postdata = req.body;
+              for (var postcat = 0; postcat < postdata.length; postcat++) {
+                  var founded = null;
+                  if (postdata[postcat].Ingradients && postdata[postcat].Ingradients.length > 0) {
+                      postdata[postcat].Ingradients = postdata[postcat].Ingradients.map(function (oneposting) {
+                          var ingobj = _.find(ingref, function (oneing) {
+                              var compared = oneing.clientId == oneposting.ingradientClientId;
+                              //console.log(oneing.clientId);
+                              //console.log(oneposting.ingradientClientId);
+                              //console.log("compared value is " + compared);
+                              return compared;
+                          });
+                          //console.log(ingobj);
+                          return {
+                              quantity: oneposting.quantity,
+                              name: ingobj._id,
+                              ingradientClientId: oneposting.ingradientClientId,
+                          };
+                      });
+                  }
+                  var category = new Production(postdata[postcat]);
+                  for (var catc = 0; catc < results.length; catc++) {
+                      if (results[catc].clientId == postdata[postcat].clientId) {
+                          category = results[catc];
+                          category.Name = postdata[postcat].Name;
+                          category.Ingradients = postdata[postcat].Ingradients;
+                          category.isactive = postdata[postcat].isactive;
+                          category.Productionamount = postdata[postcat].Productionamount;
+                          category.ProductionUnit = postdata[postcat].ProductionUnit;
+                          category.AvailableQuantity = postdata[postcat].AvailableQuantity;
+                      }
+                  }
+                  category.save(category, function (err, result) {
+                      counter += 1;
+                      if (err) { res.json(err) }
+                      else {
+                          console.log(result);
+                          if (counter == postdata.length) {
+                              return res.json(result);
+                          }
+                      }
+                  });
+              }
+
+              //console.log(postdata);
+              //console.log("postdata with production");
+              //return res.send("Done");
+          });
+       });
+    });
+
+
     app.post('/api/sync/sides', function (req, res) {
         var counter = 0;
         Ingredients.find({})

@@ -33,9 +33,9 @@ var keys = common.constants.keys();
 
 //codeto hamed uncaught exception
 var process = require('process');
-process.on('uncaughtException', function (err) {
-    console.log("uncaughtException occured" + JSON.stringify(err));
-});
+ process.on('uncaughtException', function (err) {
+     console.log("uncaughtException occured" + JSON.stringify(err));
+ });
 
 app.set('port', port);
 app.use(logger('dev'));
