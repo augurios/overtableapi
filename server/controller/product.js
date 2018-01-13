@@ -634,6 +634,7 @@ module.exports = function (app) {
                           category.Productionamount = postdata[postcat].Productionamount;
                           category.ProductionUnit = postdata[postcat].ProductionUnit;
                           category.AvailableQuantity = postdata[postcat].AvailableQuantity;
+                          category.message = postdata[postcat].message || "";
                       }
                   }
                   category.save(category, function (err, result) {
@@ -710,8 +711,10 @@ module.exports = function (app) {
            .exec(function (err, ingref) {
                Sides.find({}).populate('Ingradients.name')
               .exec(function (err, sideref) {
+                  Production.find({})
+             .exec(function (err, productionref) {
 
-                  Product.find({})
+                 Product.find({})
           .populate('Ingradients.name')
           .populate('Sides')
           .populate('Category')
@@ -731,7 +734,6 @@ module.exports = function (app) {
                   }
                   return cat;
               }
-
               function replaceIngName(Ingradients, ref) {
                   for (var i = 0; i < Ingradients.length; i++) {
                       for (var j = 0; j < ref.length; j++) {
@@ -741,7 +743,6 @@ module.exports = function (app) {
                   }
                   return Ingradients;
               }
-
               function replaceSidesName(Sides, ref) {
                   for (var i = 0; i < Sides.length; i++) {
                       for (var j = 0; j < ref.length; j++) {
@@ -751,6 +752,19 @@ module.exports = function (app) {
                   }
                   return Sides;
               }
+
+              function replaceProductionName(Productions, ref) {
+                  if(Productions){
+                  for (var i = 0; i < Productions.length; i++) {
+                      for (var j = 0; j < ref.length; j++) {
+                          if (Productions[i].ProductionClientId == ref[j].clientId)
+                              Productions[i].name = ref[j]._id;
+                      }
+                  }
+                  }
+                  return Productions;
+              }
+
               var postdata = req.body;
               for (var postcat = 0; postcat < postdata.length; postcat++) {
                   var founded = null;
@@ -759,6 +773,7 @@ module.exports = function (app) {
                   category.Sides = replaceSidesName(postdata[postcat].Sides, sideref);
                   category.Category = getCat(postdata[postcat].Category, catref);
                   category.ParentCategory = getCat(postdata[postcat].ParentCategory, catref);
+                  category.Production = replaceProductionName(postdata[postcat].Production, productionref);
                   for (var catc = 0; catc < results.length; catc++) {
                       if (results[catc].clientId == postdata[postcat].clientId) {
                           category = results[catc];
@@ -768,6 +783,7 @@ module.exports = function (app) {
                           category.Edits = postdata[postcat].Edits;
                           category.Ingradients = replaceIngName(postdata[postcat].Ingradients, ingref);
                           category.Name = postdata[postcat].Name;
+                          category.Production = replaceProductionName(postdata[postcat].Production, productionref);
                           //category.ParentCategory = postdata[postcat].ParentCategory;
                           category.Price = postdata[postcat].Price;
                           category.Quantity = postdata[postcat].Quantity;
@@ -791,9 +807,11 @@ module.exports = function (app) {
               }
 
           });
+             });
               });
            });
         });
+
     });
 
     app.post('/api/sync/productInventory', function (req, res) {
@@ -838,6 +856,10 @@ module.exports = function (app) {
     function updateSingleInvoice(invoice, islast, cb) {
         if (invoice.orders)
             delete invoice.orders;
+
+        if (invoice.tables._id == '-1') {
+            delete invoice.tables;
+        }
         var localinvoice = new Invoice(invoice);
         Invoice.find({ clientId: localinvoice.clientId }, function (err, invoices) {
             var invoiceupdate = localinvoice;
@@ -846,7 +868,7 @@ module.exports = function (app) {
                 result.clientName = invoice.clientName;
                 result.servedby = invoice.servedby;
                 result.people = invoice.people;
-                result.tables = invoice.tables;
+                result.tables = invoice.tables ;
                 result.invoiceStatus = invoice.invoiceStatus;
                 result.iscash = invoice.iscash;
                 invoiceupdate = result;

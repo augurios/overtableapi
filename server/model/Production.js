@@ -16,12 +16,14 @@ var ProductionSchema = new mongoose.Schema({
     updated_at: { type: Date, default: Date.now },
     created_by: String,
     updated_by: String,
+    message: { type: String },
     restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     clientId: { type: String },
     Productionamount: { type: String },
     ProductionUnit: { type: String },
     AvailableQuantity: { type: String },
-    isactive: { type: Number, default: 1 }
+    isactive: { type: Number, default: 1 },
+    Edits: []
 });
 
 mongoose.model('Production', ProductionSchema);

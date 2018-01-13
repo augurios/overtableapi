@@ -20,7 +20,12 @@ var ProductSchema = new mongoose.Schema({
     }],
     Sides: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Sides' }
-            ],
+    ],
+    Production: [{
+        quantity: String,
+        name: { type: mongoose.Schema.Types.ObjectId, ref: 'Production' },
+        ProductionClientId: String,
+    }],
     variations: [],
     image: { type: String },
     created_at:  { type : Date, default: Date.now },
