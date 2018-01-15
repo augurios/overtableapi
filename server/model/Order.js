@@ -11,6 +11,7 @@ var OrdersSchema = new mongoose.Schema({
     userId: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
     quantity: { type: Number },
     product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+    productClientId:{ type: String },
     status: { type: String },
     ingredient: [],
     variation: [],

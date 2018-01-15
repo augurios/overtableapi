@@ -526,21 +526,34 @@ module.exports = function (app) {
     });
 
     app.post('/api/sync/deletcategory', function (req, res) {
+        var catid = req.body.id;
+        console.log("cat id to remove " + catid);
+        Category.remove({ clientId: catid }, function (err, result) {
+            console.log("err details");
+            console.log(err);
+            res.json(result);
+        });
+    });
+
+    app.post('/api/sync/deletcategoryold', function (req, res) {
         var ids = req.body.id;
-        Category.find({})
+        Category.find({ clientId: ids})
           .exec(function (err, results) {
               //  for (var cnt = 0; cnt < ids.length; cnt++) {
-              for (var catc = 0; catc < results.length; catc++) {
-                  if (results[catc].clientId == ids) {
-                      var category = new Category(results[catc]);
-                      category.remove(category, function (err, result) {
-                          if (err) {
-                              console.log(err)
-                          }
-                          else {
-                              console.log(result);
-                          }
-                      });
+              for (var j = 0 ; j < ids.length; j++) {
+                  for (var catc = 0; catc < results.length; catc++) {
+
+                      if (results[catc].clientId == ids[j]) {
+                          var category = new Category(results[catc]);
+                          category.remove(category, function (err, result) {
+                              if (err) {
+                                  console.log(err)
+                              }
+                              else {
+                                  console.log(result);
+                              }
+                          });
+                      }
                   }
               }
               //   }
@@ -958,6 +971,22 @@ module.exports = function (app) {
         });
     }
 
+    function getProductById(clientID) {
+        return new Promise(function (resolve, reject) {
+            Product.find({ clientId: clientID }, function (err, result) {
+                if (err) {
+                    resolve({ isExist: false });
+                } else {
+                    if (result && result.length > 0) {
+                        resolve({ isExist: true, product: result[0] });
+                    } else {
+                        resolve({ isExist: false });
+                    }
+                }
+            });
+        });
+    }
+
     function updateSingleOrder(order, islast, cb) {
 
         var con = {}
@@ -976,50 +1005,60 @@ module.exports = function (app) {
                 var localorder = new Order(order);
                 if (invc && invc.id)
                     localorder.invoiceId = invc.id.toString();
-                Order.find({ clientId: localorder.clientId }, function (err, orders) {
-                    var orderupdate = localorder;
-                    if (orders && orders.length > 0) {
-                        result = orders[0];
-                        result.quantity = localorder.quantity;
-                        result.status = localorder.status;
-                        orderupdate = result;
-                    }
-                    try {
-                        orderupdate.invoiceId = invc.id.toString();
-                        orderupdate.save(orderupdate, function (err, resultorder) {
-                            if (err) {
-                                console.log('error')
-                                console.log({ message: 'error' });
-                                cb(islast);
-                            }
-                            else {
-                                console.log('success')
-                                console.log({ message: 'Update Successfully' })
-                                invc.invoiceStatus = "STARTED";
-                                var orderExist = _.find(invc.orders, function (oned) {
-                                    return oned.toString() == resultorder.id.toString();
-                                });
-                                if (!orderExist)
-                                    invc.orders.push(resultorder.id);
-                                invc.save(function (err) {
-                                    if (err) {
-                                        console.log('error')
-                                        console.log({ message: 'error' })
-                                    }
-                                    else {
-                                        console.log('success')
-                                        console.log({ resultorder })
-                                    }
-                                    cb(islast);
-                                });
-                            }
 
-                        });
-                    } catch (err) {
-                        console.log("invoice not found ofr this order");
-                        cb(islast);
+
+                getProductById(localorder.productClientId).then(function (productFromDB) {
+                    if (productFromDB.isExist) {
+                        localorder.product = productFromDB.product._id;
+                    } else {
+                        localorder.product = null;
                     }
+                    Order.find({ clientId: localorder.clientId }, function (err, orders) {
+                        var orderupdate = localorder;
+                        if (orders && orders.length > 0) {
+                            result = orders[0];
+                            result.quantity = localorder.quantity;
+                            result.status = localorder.status;
+                            orderupdate = result;
+                        }
+                        try {
+                            orderupdate.invoiceId = invc.id.toString();
+                            orderupdate.save(orderupdate, function (err, resultorder) {
+                                if (err) {
+                                    console.log('error')
+                                    console.log({ message: 'error' });
+                                    cb(islast);
+                                }
+                                else {
+                                    console.log('success')
+                                    console.log({ message: 'Update Successfully' })
+                                    invc.invoiceStatus = "STARTED";
+                                    var orderExist = _.find(invc.orders, function (oned) {
+                                        return oned.toString() == resultorder.id.toString();
+                                    });
+                                    if (!orderExist)
+                                        invc.orders.push(resultorder.id);
+                                    invc.save(function (err) {
+                                        if (err) {
+                                            console.log('error')
+                                            console.log({ message: 'error' })
+                                        }
+                                        else {
+                                            console.log('success')
+                                            console.log({ resultorder })
+                                        }
+                                        cb(islast);
+                                    });
+                                }
+
+                            });
+                        } catch (err) {
+                            console.log("invoice not found ofr this order");
+                            cb(islast);
+                        }
+                    });
                 });
+
             }
         });
     }
