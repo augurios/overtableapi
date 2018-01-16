@@ -884,6 +884,8 @@ module.exports = function (app) {
                 result.tables = invoice.tables ;
                 result.invoiceStatus = invoice.invoiceStatus;
                 result.iscash = invoice.iscash;
+             result.discount = invoice.discount;
+
                 invoiceupdate = result;
             }
 
