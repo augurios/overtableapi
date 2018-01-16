@@ -10,6 +10,7 @@ var InvoiceSchema = new mongoose.Schema({
   iscash: { type: Boolean, default: true },
   tables: { type: mongoose.Schema.Types.ObjectId, ref: 'Table' },
   servedby: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+  discount: {},
   //orders: [{
   //    note: String,
   //    quantity:{ type: Number },
