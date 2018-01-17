@@ -809,7 +809,13 @@ module.exports = function (app) {
                   }
                   category.save(category, function (err, result) {
                       counter += 1;
-                      if (err) { res.json(err) }
+                      if (err) { 
+                          if (counter == postdata.length) {
+                             return res.json(err);
+                          }else{
+                              console.log(err);
+                          }
+                         }
                       else {
                           console.log(result);
                           if (counter == postdata.length) {
@@ -1190,6 +1196,9 @@ module.exports = function (app) {
                                     isendshift = true;
                                     endSHift(localshift.restaurant.toString())
                                 }
+                                shift.openingBalance = shiftupdate.openingBalance
+                                shift.closingBalance = shiftupdate.closingBalance
+                                shift.edits = shiftupdate.edits || [];
                                 shiftupdate = shift;
                             }
                             shiftupdate.invoices = invlists;

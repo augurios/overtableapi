@@ -206,7 +206,7 @@ module.exports = function (app) {
                         res.json(helpers.response(400, false, null, 0))
                     }
                 });
-                res.json(sess);
+                //res.json(sess);
             }
             else
                 res.json(0);
