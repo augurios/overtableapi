@@ -114,7 +114,7 @@ module.exports = function (app) {
             sessions.save();
             return res.json(helpers.response(200, true, sessions, messages.loggedout))
         });
-        return res.json(helpers.response(200, true, sess, messages.loggedout))
+        //return res.json(helpers.response(200, true, sess, messages.loggedout))
     });
 
     app.get('/api/get/employee', function (req, res) {
@@ -136,7 +136,11 @@ module.exports = function (app) {
 
         // if (sess.role) {
         Employee.find({ active: 1, restaurant: req.params.userid }, { firstname: 1, lastname: 1, email: 1, role: 1, phone: 1, pin: 1, position: 1, dateofbirth: 1 }, function (err, users) {
-            if (err) { console.log(err); res.json(0); }
+            if (err) {
+                 console.log(err); 
+                 
+               return  res.json(0); 
+                }
             return res.json(helpers.response(200, true, users, 0))
         });
         //}
