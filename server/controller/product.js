@@ -652,7 +652,10 @@ module.exports = function (app) {
                   }
                   category.save(category, function (err, result) {
                       counter += 1;
-                      if (err) { res.json(err) }
+                      if (err) {
+                          if (counter == postdata.length)
+                              return res.json(err);
+                      }
                       else {
                           console.log(result);
                           if (counter == postdata.length) {
