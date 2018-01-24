@@ -894,7 +894,7 @@ module.exports = function (app) {
                 result.invoiceStatus = invoice.invoiceStatus;
                 result.iscash = invoice.iscash;
              result.discount = invoice.discount;
-
+             result.override = invoice.override;
                 invoiceupdate = result;
             }
 

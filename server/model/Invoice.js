@@ -29,7 +29,11 @@ var InvoiceSchema = new mongoose.Schema({
   active: {type: Number, default: 1},
   syncflag: { type: Number, default: 0 },
   restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
-  people: { type: Number }
+  people: { type: Number },
+  override: {
+      isPriceOverride: Boolean,
+      overridePrice: { type: Number, default: 0 }
+  }
 });
 
 mongoose.model('Invoice', InvoiceSchema);
