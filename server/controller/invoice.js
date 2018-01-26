@@ -44,6 +44,21 @@ module.exports = function (app) {
           })
     });
 
+    app.get('/clientapp/api/v1/invoicescount/:resid', function (req, res) {
+        Invoice.find({ restaurant: req.params.resid })
+          .exec()
+          .then(function (result, err) {
+              if (err)
+                  res.send({ billNo: 0 });
+              else {
+                  if (result && result.length > 0)
+                      res.send({ billNo: result.length });
+                  else
+                      res.send({ billNo: 0 });
+              }
+          })
+    });
+
     app.post('/api/v1/invoice', function (req, res) {
 
 
