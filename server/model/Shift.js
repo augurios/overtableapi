@@ -18,6 +18,8 @@ var ShiftSchema = new mongoose.Schema({
     isactive: { type: Number, default: 1 },
     openingBalance: Number,
     closingBalance:Number,
+    openShiftBy:String,
+    closeShiftBy:String,
     edits:[]
 });
   

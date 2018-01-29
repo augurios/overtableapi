@@ -65,6 +65,7 @@ module.exports = function (app) {
                                         var tokenval = common.jwt.sign({email:user.email,_id:user._id}, keys.sessionkey);
                                         sess.token = tokenval;
                                         sess.role = user.role;
+                                        sess.image=user.image
 
                                         LoggedUserNew.userid = user._id;
                                         LoggedUserNew.usertoken = user.token;
@@ -76,6 +77,7 @@ module.exports = function (app) {
                                         LoggedUserNew.role = user.role;
                                         LoggedUserNew.name = user.firstname;
                                         LoggedUserNew.email = user.email;
+                                          LoggedUserNew.image = user.image;
 
                                         LoggedUserNew.save(function(err,sessionsave){
                                             sess.instanceid = sessionsave._id
@@ -125,6 +127,18 @@ module.exports = function (app) {
         }
 
     });
+
+
+    app.get('/api/v1/getuserbyid/:id', function (req, res) {
+        User.findById(req.params.id, function (err, user) {
+            if (err) {
+                return res.json(helpers.response(400, false, 0, messages.actionnotcompleted))
+            } else {
+                return res.json(helpers.response(200, true, user, messages.done));
+            }
+        });
+    });
+
 
 
     app.get('/clientapp/auth/get_session/:instanceid', function (req, res) {

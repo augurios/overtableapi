@@ -110,9 +110,17 @@ module.exports = function (app) {
 
     app.post('/clientapp/api/v1/terminateempsession/:instanceid', function (req, res) {
         Logged.findById(req.params.instanceid, function (err, sessions) {
-            delete sessions.employee;
-            sessions.save();
-            return res.json(helpers.response(200, true, sessions, messages.loggedout))
+            var toReturn = {
+                logOutSuccess: true
+            };
+            try {
+                //delete sessions["employee"];
+                delete sessions.employee;
+                sessions.save();
+                return res.json(helpers.response(200, true, toReturn, messages.loggedout))
+            } catch (err) {
+                return res.json(helpers.response(200, true, toReturn, messages.loggedout))
+            }
         });
         //return res.json(helpers.response(200, true, sess, messages.loggedout))
     });

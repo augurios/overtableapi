@@ -1201,6 +1201,8 @@ module.exports = function (app) {
                                 }
                                 shift.openingBalance = shiftupdate.openingBalance
                                 shift.closingBalance = shiftupdate.closingBalance
+                                shift.openShiftBy=shiftupdate.openShiftBy
+                                shift.closeShiftBy=shiftupdate.closeShiftBy
                                 shift.edits = shiftupdate.edits || [];
                                 shiftupdate = shift;
                             }
