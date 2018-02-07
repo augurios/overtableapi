@@ -32,6 +32,8 @@ module.exports = function (app) {
     var Table = common.mongoose.model('Table');
     var Employee = common.mongoose.model('Employee');
     var Order = common.mongoose.model('Order');
+    var ErrorLog = common.mongoose.model('ErrorLog');
+
 
     app.get('/api/v1/getBillno', function (req, res) {
         tokenVerify(req, res)
@@ -108,6 +110,21 @@ module.exports = function (app) {
             return res.json(helpers.response(401, false, 0, messages.unauthorized))
         }
     })
+
+ app.post('/api/v1/ErrorLogs', function (req, res) {
+        var ErrorData = new ErrorLog(req.body);
+ // var error. =req.body.data
+        if (ErrorData) {
+            ErrorData.save(ErrorData, function (err, result) {
+                console.log(result);
+                return res.json(result);
+            });
+        }
+        else {
+            return res.json(helpers.response(401, false, 0, 'Not save Error Log'))
+        }
+    })
+
 
     app.post('/api/v1/updateinvoice', function (req, res) {
 

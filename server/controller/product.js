@@ -781,6 +781,7 @@ module.exports = function (app) {
                   return Productions;
               }
 
+
               var postdata = req.body;
               for (var postcat = 0; postcat < postdata.length; postcat++) {
                   var founded = null;
@@ -790,6 +791,7 @@ module.exports = function (app) {
                   category.Category = getCat(postdata[postcat].Category, catref);
                   category.ParentCategory = getCat(postdata[postcat].ParentCategory, catref);
                   category.Production = replaceProductionName(postdata[postcat].Production, productionref);
+                 
                   for (var catc = 0; catc < results.length; catc++) {
                       if (results[catc].clientId == postdata[postcat].clientId) {
                           category = results[catc];
@@ -808,6 +810,8 @@ module.exports = function (app) {
                           category.image = postdata[postcat].image;
                           category.variations = postdata[postcat].variations;
                           category.OrderGroup = postdata[postcat].OrderGroup;
+
+                          category.isactive = postdata[postcat].isactive
                       }
                   }
                   category.save(category, function (err, result) {

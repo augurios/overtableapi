@@ -16,6 +16,7 @@ const Shift = require('../model/Shift');
 const Connection = require('../model/Connection');
 const Production = require('../model/Production');
 const Room = require('../model/Room');
+const ErrorLog = require('../model/ErrorLog');
 
 module.exports = function (app) {
 
