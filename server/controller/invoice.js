@@ -9,6 +9,9 @@ var response = { status: null, success: null, data: null }; // status provide co
 var sess = {}; // common session constant
 const helpers = common.helpers;
 const messages = common.constants.messages();
+
+var mongoose = require('mongoose');
+
 function tokenVerify(req,res) {
   return new Promise(function (resolve,reject) {
     if(req.headers['x-access-token']) {
@@ -325,6 +328,79 @@ module.exports = function (app) {
     });
 
 
+
+
+    function getOrdersToReturn(resId) {
+        return new Promise(function (resolve, reject) {
+            var cond = {
+                $and: [
+                    { status: { $ne: "COMPLETED" } },
+                    { restaurantId: mongoose.Types.ObjectId(resId) }
+                ]
+            }
+            Order.find(cond)
+                  .populate('product')
+                  .populate('invoiceId')
+                  .exec(function (err, result) {
+                      if (err) {
+                          console.log(err);
+                          resolve([]);
+                      } else {
+                          var options = {
+                              path: 'invoiceId.tables',
+                              model: 'Table'
+                          };
+                          Order.populate(result, options, function (err, projects) {
+                              if (err)
+                                  resolve([]);
+                              else
+                                  resolve(projects);
+                          })
+                      }
+                  })
+        });
+    }
+
+    app.post('/clientapp/sync/loadappdata', function (req, res) {
+        console.log("executing the loadapidate api");
+        var resId = req.body.resId;
+        var cond = {
+            $and: [
+                { invoiceStatus: { $ne: "ARCHIVED" } },
+                { restaurant: mongoose.Types.ObjectId(resId) }
+            ]
+        };
+        Invoice.find(cond)
+       .populate('tables')
+       .populate('servedby')
+       .populate('orders')
+       .exec(function (err, result) {
+           var invToReturn = [];
+           var options = {
+               path: 'orders.product',
+               model: 'Product'
+           };
+           Invoice.populate(result, options, function (err, tempresult) {
+               var roomoptions = {
+                   path: 'tables.roomid',
+                   model: 'Room'
+               };
+               console.log("executing the loadapidate api before populate");
+               Invoice.populate(tempresult, roomoptions, function (err, projects) {
+                   invToReturn = projects;
+                   console.log("executing the loadapidate api before orders");
+                   getOrdersToReturn(resId).then(function (orders) {
+                       console.log("executing the loadapidate api sendign  response");
+                       res.json({ INVOICES: invToReturn, ORDERS: orders });
+                   }).catch(function (err) {
+                       console.log("executing the loadapidate api sending error reponse ");
+                       res.json({ INVOICES: invToReturn, ORDERS: [] });
+                   });
+               });
+           });
+
+       })
+    })
 
     app.get('/api/get/invoice', function (req, res) {
 
