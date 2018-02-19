@@ -16,14 +16,17 @@ var ProductSchema = new mongoose.Schema({
     Ingradients: [{
         quantity: String,
         name: { type: mongoose.Schema.Types.ObjectId, ref: 'Ingredients' },
+        isoptional:{type:Boolean,default:false},
         ingradientClientId: String,
     }],
     Sides: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Sides' }
     ],
+    OptionalSides:[],
     Production: [{
         quantity: String,
         name: { type: mongoose.Schema.Types.ObjectId, ref: 'Production' },
+        isoptional:{type:Boolean,default:false},
         ProductionClientId: String,
     }],
     variations: [],

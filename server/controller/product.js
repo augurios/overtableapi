@@ -22,7 +22,7 @@ var Production = common.mongoose.model('Production');
 var Invoice = common.mongoose.model('Invoice');
 var Order = common.mongoose.model('Order');
 var Shift = common.mongoose.model('Shift');
-    
+var Provider = common.mongoose.model('Provider');
 
 function additem(postdata) {
     return new Promise(function (resolve, reject) {
@@ -203,6 +203,21 @@ module.exports = function (app) {
        })
 
     })
+
+  app.post('/api/get/Provider', function (req, res) {
+        Provider.find({restaurant: req.body.id},function(err, result){
+           if (err) {
+               console.log(err);
+              return res.json(0);
+           }else{
+           return res.json(result);
+           }
+       })
+
+    })
+
+
+
     app.post('/api/get/Sides', function (req, res) {
 
         Sides.find({ restaurant: req.body.id })
@@ -581,6 +596,8 @@ module.exports = function (app) {
                        category.UnitType = postdata[postcat].UnitType;
                        category.message = postdata[postcat].message;
                        category.isactive = postdata[postcat].isactive;
+                       category.provider_name = postdata[postcat].provider_name || '';
+                       category.editsNote = postdata[postcat].editsNote || '';
                    }
                }
                category.save(category, function (err, result) {
@@ -648,6 +665,7 @@ module.exports = function (app) {
                           category.ProductionUnit = postdata[postcat].ProductionUnit;
                           category.AvailableQuantity = postdata[postcat].AvailableQuantity;
                           category.message = postdata[postcat].message || "";
+                          category.Edits=postdata[postcat].Edits;
                       }
                   }
                   category.save(category, function (err, result) {
@@ -810,7 +828,7 @@ module.exports = function (app) {
                           category.image = postdata[postcat].image;
                           category.variations = postdata[postcat].variations;
                           category.OrderGroup = postdata[postcat].OrderGroup;
-
+                          category.OptionalSides = postdata[postcat].OptionalSides;
                           category.isactive = postdata[postcat].isactive
                       }
                   }
@@ -859,6 +877,36 @@ module.exports = function (app) {
           });
     });
 
+
+    app.post('/api/sync/Provider', function (req, res) {
+        Provider.find({})
+          .exec(function (err, results) {
+              var postdata = req.body;
+              for (var postcat = 0; postcat < postdata.length; postcat++) {
+                  var isExist = false;
+                  if(results && results.length>0){
+                  for (var catc = 0; catc < results.length; catc++) {
+                      if (results[catc].clientId == postdata[postcat].clientId) {
+                           isExist = true;
+                      }
+                  }
+                  }
+                  if(!isExist){
+                   var category = new Provider(postdata[postcat]);
+                   category.save(function (err, result) {
+                              if (err) {
+                                   res.json(err) 
+                                }
+                              else { 
+                                  console.log(result); 
+                                }
+                          });
+                  }
+              
+              }
+          });
+    });
+
     app.post('/api/sync/ingredientsInventory', function (req, res) {
         Ingredients.find({})
               .exec(function (err, results) {
@@ -868,6 +916,7 @@ module.exports = function (app) {
                           if (results[catc].clientId == postdata[postcat].clientId) {
                               var category = results[catc];
                               category.Quantity = postdata[postcat].Quantity;
+                              
                               category.save(category, function (err, result) {
                                   if (err) { res.json(err) }
                                   else { console.log(result); }
@@ -899,6 +948,7 @@ module.exports = function (app) {
                 result.iscash = invoice.iscash;
              result.discount = invoice.discount;
              result.override = invoice.override;
+             result.closeAt=invoice.closeAt;
                 invoiceupdate = result;
             }
 
@@ -1034,6 +1084,7 @@ module.exports = function (app) {
                             result = orders[0];
                             result.quantity = localorder.quantity;
                             result.status = localorder.status;
+                            result.OptionalIngredient=localorder.OptionalIngredient;
                             orderupdate = result;
                         }
                         try {

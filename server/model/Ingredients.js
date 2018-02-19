@@ -11,6 +11,8 @@ var IngredientsSchema = new mongoose.Schema({
     created_at:  { type : Date, default: Date.now },
     updated_at:  { type : Date, default: Date.now },
     created_by: String,
+    provider_name: { type: String },
+    editsNote:{ type: String},
     updated_by: String,
     isactive: { type: Number, default: 1 },
     message: { type: String },

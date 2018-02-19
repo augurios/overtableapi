@@ -16,6 +16,7 @@ var OrdersSchema = new mongoose.Schema({
     ingredient: [],
     variation: [],
     extraingredient: [],
+    OptionalIngredient:[],
     date: { type: Date, default: Date.now },
 });
 

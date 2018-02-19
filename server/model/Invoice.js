@@ -26,6 +26,7 @@ var InvoiceSchema = new mongoose.Schema({
   updated_at:  { type : Date, default: Date.now },
   created_by: String,
   updated_by: String,
+  closeAt:{ type : Date, default: Date.now },
   active: {type: Number, default: 1},
   syncflag: { type: Number, default: 0 },
   restaurant: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
