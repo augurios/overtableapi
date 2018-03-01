@@ -23,6 +23,7 @@ var Invoice = common.mongoose.model('Invoice');
 var Order = common.mongoose.model('Order');
 var Shift = common.mongoose.model('Shift');
 var Provider = common.mongoose.model('Provider');
+var ExpenceReport = common.mongoose.model('ExpenceReport');
 
 function additem(postdata) {
     return new Promise(function (resolve, reject) {
@@ -771,8 +772,14 @@ module.exports = function (app) {
               function replaceIngName(Ingradients, ref) {
                   for (var i = 0; i < Ingradients.length; i++) {
                       for (var j = 0; j < ref.length; j++) {
-                          if (Ingradients[i].name == ref[j].clientId)
+                          if (Ingradients[i].name && Ingradients[i].name.clientId)
+                          {
+                          if (Ingradients[i].name.clientId == ref[j].clientId)
                               Ingradients[i].name = ref[j]._id;
+                          }else{
+                            if (Ingradients[i].name == ref[j].clientId)
+                                Ingradients[i].name = ref[j]._id;
+                          }
                       }
                   }
                   return Ingradients;
@@ -906,6 +913,41 @@ module.exports = function (app) {
               }
           });
     });
+
+
+    app.post('/api/sync/ExpenceReport', function (req, res) {
+        ExpenceReport.find({})
+          .exec(function (err, results) {
+              var postdata = req.body;
+              for (var postcat = 0; postcat < postdata.length; postcat++) {
+                  var isExist = false;
+                  if (results && results.length > 0) {
+                      for (var catc = 0; catc < results.length; catc++) {
+                          if (results[catc].clientId == postdata[postcat].clientId) {
+                              isExist = true;
+                          }
+                      }
+                  }
+                  if (!isExist) {
+                      var category = new ExpenceReport(postdata[postcat]);
+                      category.save(function (err, result) {
+                          if (err) {
+                              res.json(err)
+                          }
+                          else {
+                              console.log(result);
+                          }
+                      });
+                  }
+
+              }
+          });
+    });
+
+
+    
+
+
 
     app.post('/api/sync/ingredientsInventory', function (req, res) {
         Ingredients.find({})
@@ -1259,6 +1301,7 @@ module.exports = function (app) {
                                 shift.openShiftBy=shiftupdate.openShiftBy
                                 shift.closeShiftBy=shiftupdate.closeShiftBy
                                 shift.edits = shiftupdate.edits || [];
+                              //  shift.Expences = shiftupdate.Expences || [];
                                 shiftupdate = shift;
                             }
                             shiftupdate.invoices = invlists;

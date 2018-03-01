@@ -18,6 +18,9 @@ const Production = require('../model/Production');
 const Room = require('../model/Room');
 const ErrorLog = require('../model/ErrorLog');
 const Provider = require('../model/Provider');
+
+const ExpenceReport = require('../model/ExpenceReport');
+
 module.exports = function (app) {
 
   //global constants/paths
