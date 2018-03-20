@@ -36,7 +36,7 @@ module.exports = function (app) {
     var Employee = common.mongoose.model('Employee');
     var Order = common.mongoose.model('Order');
     var ErrorLog = common.mongoose.model('ErrorLog');
-
+    var Shift = common.mongoose.model('Shift');
 
     app.get('/api/v1/getBillno', function (req, res) {
         tokenVerify(req, res)
@@ -330,12 +330,13 @@ module.exports = function (app) {
 
 
 
-    function getOrdersToReturn(resId) {
+    function getOrdersToReturn(resId,shiftId) {
         return new Promise(function (resolve, reject) {
             var cond = {
                 $and: [
                     { status: { $ne: "COMPLETED" } },
-                    { restaurantId: mongoose.Types.ObjectId(resId) }
+                    { restaurantId: mongoose.Types.ObjectId(resId) },
+                    { shiftId: shiftId }
                 ]
             }
             Order.find(cond)
@@ -360,46 +361,66 @@ module.exports = function (app) {
                   })
         });
     }
+    
+    function getInvoiceIds(sid) {
+        var idToReturns = [];
+        return new Promise(function (resolve, reject) {
+            Shift.findOne({ clientId: sid }, function (err, shift) {
+                resolve(shift);
+            });
+        });
+    }
 
     app.post('/clientapp/sync/loadappdata', function (req, res) {
-        console.log("executing the loadapidate api");
-        var resId = req.body.resId;
-        var cond = {
-            $and: [
-                { invoiceStatus: { $ne: "ARCHIVED" } },
-                { restaurant: mongoose.Types.ObjectId(resId) }
-            ]
-        };
-        Invoice.find(cond)
-       .populate('tables')
-       .populate('servedby')
-       .populate('orders')
-       .exec(function (err, result) {
-           var invToReturn = [];
-           var options = {
-               path: 'orders.product',
-               model: 'Product'
-           };
-           Invoice.populate(result, options, function (err, tempresult) {
-               var roomoptions = {
-                   path: 'tables.roomid',
-                   model: 'Room'
+        //getInvoiceIds(req.body.shiftId).then(function (shift) {
+            // var invs = shift.invoices || [];
+            // var ods = shift.orders || [];
+            //console.log(invs);
+            console.log("executing the loadapidate api");
+            var resId = req.body.resId;
+            var cond = {
+                $and: [
+                    { invoiceStatus: { $ne: "ARCHIVED" } },
+                    { restaurant: mongoose.Types.ObjectId(resId) },
+                    { shiftId: req.body.shiftId }
+                ]
+            };
+            Invoice.find(cond)
+           .populate('tables')
+           .populate('servedby')
+           .populate('orders')
+           .exec(function (err, result) {
+               var invToReturn = [];
+               var options = {
+                   path: 'orders.product',
+                   model: 'Product'
                };
-               console.log("executing the loadapidate api before populate");
-               Invoice.populate(tempresult, roomoptions, function (err, projects) {
-                   invToReturn = projects;
-                   console.log("executing the loadapidate api before orders");
-                   getOrdersToReturn(resId).then(function (orders) {
-                       console.log("executing the loadapidate api sendign  response");
-                       res.json({ INVOICES: invToReturn, ORDERS: orders });
-                   }).catch(function (err) {
-                       console.log("executing the loadapidate api sending error reponse ");
-                       res.json({ INVOICES: invToReturn, ORDERS: [] });
+               Invoice.populate(result, options, function (err, tempresult) {
+                   var roomoptions = {
+                       path: 'tables.roomid',
+                       model: 'Room'
+                   };
+                   console.log("executing the loadapidate api before populate");
+                   Invoice.populate(tempresult, roomoptions, function (err, projects) {
+                       invToReturn = projects;
+                       console.log("executing the loadapidate api before orders");
+                       getOrdersToReturn(resId, req.body.shiftId).then(function (orders) {
+                           console.log("executing the loadapidate api sendign  response");
+                           var obj = { INVOICES: invToReturn, ORDERS: orders }
+                           console.log(obj.INVOICES.length);
+                           console.log(obj.ORDERS.length);
+                           res.json(obj);
+                           console.log("reload loadappdata is complete")
+                       }).catch(function (err) {
+                           console.log("executing the loadapidate api sending error reponse ");
+                           res.json({ INVOICES: invToReturn, ORDERS: [] });
+                       });
                    });
                });
-           });
 
-       })
+           })
+
+        //});
     })
 
     app.get('/api/get/invoice', function (req, res) {

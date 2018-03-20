@@ -991,6 +991,9 @@ module.exports = function (app) {
              result.discount = invoice.discount;
              result.override = invoice.override;
              result.closeAt=invoice.closeAt;
+             result.shiftId=invoice.shiftId;
+             result.ver=invoice.ver;
+             result.editingBy = invoice.editingBy;
                 invoiceupdate = result;
             }
 
@@ -1126,7 +1129,13 @@ module.exports = function (app) {
                             result = orders[0];
                             result.quantity = localorder.quantity;
                             result.status = localorder.status;
+                            result.shiftId = localorder.shiftId || result.shiftId;
                             result.OptionalIngredient=localorder.OptionalIngredient;
+                            result.variation=localorder.variation;
+                            result.extraingredient=localorder.extraingredient;
+                            result.note=localorder.note;
+                            result.ingredient=localorder.ingredient;
+                            
                             orderupdate = result;
                         }
                         try {

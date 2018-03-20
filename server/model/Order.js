@@ -14,10 +14,11 @@ var OrdersSchema = new mongoose.Schema({
     productClientId:{ type: String },
     status: { type: String },
     ingredient: [],
-    variation: [],
+    variation: String,
     extraingredient: [],
     OptionalIngredient:[],
     date: { type: Date, default: Date.now },
+    shiftId:String
 });
 
 mongoose.model('Order', OrdersSchema);

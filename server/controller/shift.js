@@ -12,6 +12,8 @@ var sess = {}; // common session constant
 const helpers = common.helpers;
 const messages = common.constants.messages();
 
+var mongoose = require('mongoose');
+
 module.exports = function (app) {
 
     //Models Required
@@ -108,7 +110,7 @@ module.exports = function (app) {
 
     app.post('/api/get/getshiftWithOutLogout', function (req, res) {
 
-        Shift.find({restaurant: req.body.id, endtime:null },function (err, result) {
+        Shift.find({restaurant: mongoose.Types.ObjectId(req.body.id), endtime:null },function (err, result) {
             if (err) {
                 console.log(err);
                 res.json(0);
