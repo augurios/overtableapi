@@ -14,11 +14,11 @@ var mongoose = require('mongoose');
 //const MGDCMT = 'meanapp';
 
 //Dev Database Details 
-const MGHOST = 'ec2-34-212-134-59.us-west-2.compute.amazonaws.com';
-const MGUSER = 'overtable';
-const MGPWWD = 'overtable';
+const MGHOST = 'overtableapp.disruptive.pro';
+const MGUSER = 'dbadminapp';
+const MGPWWD = 'secoelpinto';
 const MGPORT = '27017';
-const MGDCMT = 'overtabledb';
+const MGDCMT = 'meanapp';
 
 const MGSTRING = 'mongodb://'+MGUSER+':'+MGPWWD+'@'+MGHOST+':'+MGPORT+'/'+MGDCMT+''
 
