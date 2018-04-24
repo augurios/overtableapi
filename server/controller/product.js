@@ -992,8 +992,10 @@ module.exports = function (app) {
              result.override = invoice.override;
              result.closeAt=invoice.closeAt;
              result.shiftId=invoice.shiftId;
+             result.createdShiftId = invoice.createdShiftId
              result.ver=invoice.ver;
              result.editingBy = invoice.editingBy;
+          result.ispanding = invoice.ispanding;
                 invoiceupdate = result;
             }
 
@@ -1383,7 +1385,6 @@ module.exports = function (app) {
     }
 
     app.post('/api/sync/billsModule', function (req, res) {
-        console.log(updateSingleInvoice)
         console.log(req.body);
         var TBMData = req.body;
         removeOrders(TBMData).then(function () {

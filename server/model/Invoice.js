@@ -36,8 +36,10 @@ var InvoiceSchema = new mongoose.Schema({
       overridePrice: { type: Number, default: 0 }
   },
   shiftId:String,
+  createdShiftId:String,
   ver:{type: Number, default: 1},
   editingBy:String,
+  ispanding:{ type: Boolean, default: false }
 });
 
 mongoose.model('Invoice', InvoiceSchema);
