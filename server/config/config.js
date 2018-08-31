@@ -5,7 +5,7 @@ var rootPath = path.normalize(__dirname + '/../..');
 
 // environment
 if (stage == "LOCAL") {
-  var URL_DOMAIN = "http://overtableapp.disruptive.pro:"+port+"/";
+  var URL_DOMAIN = "http://ec2-52-36-100-46.us-west-2.compute.amazonaws.com:"+port+"/";
   var SERVER_RETURN_ROOT = URL_DOMAIN;
 }
 else {
